@@ -1,4 +1,3 @@
-# '''Serving dynamic images with Pandas and matplotlib (using flask).'''
 import pyodbc
 import matplotlib.pyplot as plt
 import matplotlib
@@ -26,7 +25,7 @@ html = '''
 '''
 
 @app.route("/")
-def hello():
+def mainPlot():
     df = pd.DataFrame(
         {'y':np.random.randn(10), 'z':np.random.randn(10)},
         index=pd.period_range('1-2000',periods=10),
