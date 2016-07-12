@@ -41,10 +41,8 @@ def mainPlot():
 
 
     accb = r"F:\debug\web\Anaconda_home\db_cy2_test.accdb"
-    connStr = """
-    DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};
-    DBQ=F:\debug\web\Anaconda_home\db_cy2_test.accdb;
-    """
+    accb_path2 = r"D:\Data\code\Projets\Anaconda\db_cy2.accdb"
+    connStr = "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s;" % accb_path2
     cnxn = pyodbc.connect(connStr)
     cursor = cnxn.cursor()
     query = """select count(*) as nbr, d.stru_d as name from pla90 as p, dico_stru as d
