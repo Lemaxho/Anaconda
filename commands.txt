@@ -1,0 +1,10 @@
+
+PYTHONHOME
+C:\OSGeo4W64\apps\Python27
+
+PYTHONPATH
+C:\OSGeo4W64\apps\Python27\Lib
+
+
+ipython nbconvert --to pdf MatplotlibExample.ipynb
+ipython nbconvert --to html MatplotlibExample.ipynb
