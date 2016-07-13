@@ -39,10 +39,9 @@ def mainPlot():
     data = base64.b64encode(buf.getvalue())
     str = data.decode(encoding='UTF-8')
 
-
-    accb = r"F:\debug\web\Anaconda_home\db_cy2_test.accdb"
+    accb_path1 = r"F:\debug\web\Anaconda_home\db_cy2_test.accdb"
     accb_path2 = r"D:\Data\code\Projets\Anaconda\db_cy2.accdb"
-    connStr = "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s;" % accb_path2
+    connStr = "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s;" % accb_path1
     cnxn = pyodbc.connect(connStr)
     cursor = cnxn.cursor()
     query = """select count(*) as nbr, d.stru_d as name from pla90 as p, dico_stru as d
