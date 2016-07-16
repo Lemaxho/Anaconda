@@ -7,5 +7,5 @@ output_from_parsed_template = template.render(foo='Hello World!')
 print(output_from_parsed_template)
 
 # to save the results
-with open("my_new_file.html", "wb") as fh:
+with open("my_new_file.html", "w") as fh:
     fh.write(output_from_parsed_template)
