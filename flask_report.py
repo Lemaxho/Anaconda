@@ -26,10 +26,8 @@ html = '''
 
 @app.route("/")
 def mainPlot():
-    df = pd.DataFrame(
-        {'y':np.random.randn(10), 'z':np.random.randn(10)},
-        index=pd.period_range('1-2000',periods=10),
-    )
+    df = pd.DataFrame({'y': np.random.randn(10), 'z': np.random.randn(10)},
+                      index=pd.period_range('1-2000', periods=10))
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     df.plot(ax=ax)

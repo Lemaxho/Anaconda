@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
-    <title>Title</title>
+    <title>{{ d.get('title') }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel='stylesheet' type='text/css' href='style/style.css'>
@@ -10,11 +10,42 @@
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div class=" container" ng-cloak>
+<div class="container">
     <div class="row">
         <div class="col-lg-1 col-xl-2"></div>
         <div class="col-xs-12 col-sm-12 col-lg-10 col-xl-8">
-            <h1>{{ foo }}</h1>
+            <h1>{{ d.get('foo') }}</h1>
+            <p>
+                {{ d.get('text') }}
+            </p>
+            <div class="row">
+                <div class="col-xs-8 col-md-8">
+                    <div class='thumbnail'>
+                        <img src="data:image/png;base64,{{ d.get('plot1') }}" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6 col-md-6">
+                    <table class="table table-striped table-condensed">
+                        <thead>
+                        <tr>
+                            <th>Tranche</th>
+                            <th>Chênaie</th>
+                            <th>Pessière</th>
+                        </tr>
+                        </thead>
+                        {% for row in d.get('table') %}
+                        <tr>
+                            {% for cell in row %}
+                            <td>{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
         </div>
         <div class="col-lg-1 col-xl-2"></div>
     </div>
