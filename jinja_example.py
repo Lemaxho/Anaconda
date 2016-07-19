@@ -100,15 +100,3 @@ import pdfkit
 path_wkthmltopdf = 'E:/programs/wkhtmltopdf/bin/wkhtmltopdf.exe'
 pdfkit.from_string(output_from_parsed_template, "my_new_file2.pdf")
 
-
-
-# Passing args to jinja with a dict
-# for row in rows:
-#     thedict=dict(zip(col_names,row))
-#     filename='zzpuma_' + row[0] + '.tex'
-#     folder='test3'
-#     outpath=os.path.join(folder,filename)
-#     outfile=open(outpath,'w')
-#     outfile.write(template.render(d=thedict))
-#     outfile.close()
-#     # os.system("pdflatex -output-directory=" + folder + " " + outpath)
