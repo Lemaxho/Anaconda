@@ -9,6 +9,7 @@ import matplotlib.ticker as plticker
 matplotlib.style.use('ggplot')
 import numpy as np
 import pandas as pd
+import pandas.tools.plotting as pdp
 import io
 import base64
 
@@ -66,37 +67,94 @@ plotSql.yaxis.set_minor_locator(minor_loc)
 plotSql.yaxis.grid(True, which="minor")
 
 figSql = plotSql.get_figure()
-# figSql.tight_layout()
 str_plot1 = Lempica.get_figure_image_str(figSql)
-
-# pivoted = df.pivot('x', 'y')
-# table = pivoted.values.tolist()
 table = df.values.tolist()
-# print(table)
 
+# Plot 2
+query = """select p.tranche, p.peup_pl, d.peup_d as name, count(*) as nbr from pla90 as p, dico_peup as d
+where p.peup_pl = d.code and p.cy=1 and p.peup_pl is not null group by p.tranche, p.peup_pl, d.peup_d;"""
+df2 = pd.read_sql(query, cnxn)
+df2.set_index('name')
+
+df_select = df2[df2['nbr'].notnull() & (df2['peup_pl'] < 6)]
+df_select.set_index('name')
+# [df2['nbr'].notnull() & (df2['peup_pl'] < 6)]
+# Remember: DataFrame.pivot([index, columns, values])
+# Reshape data (produce a “pivot” table) based on column values.
+# Index from tranche, columns from name, values from nbr
+pivoted = df_select[['tranche', 'name', 'nbr']].pivot('tranche', 'name', 'nbr')
+table2 = pivoted.values.tolist()
+# print(table2)
+# print(list(pivoted))
+# print(pivoted.T)
+# print(type(pivoted.T))
+# print(pivoted.T.to_html())
+print(pivoted.T.to_dict())
+
+pivoted_dict = pivoted.T.to_dict()
+
+# & (pivoted['nationality'] == "USA") pivoted['nbr'].notnull() pivoted.describe()  width=1, bar
+plotSql2 = pivoted.plot(kind='line', stacked=False,  lw=2, rot=0, alpha=0.5, legend=True, table=False)
+plotSql2.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), fancybox=True, shadow=False, ncol=3)
+# box = (pos1.x0 + 0.3, pos1.y0 + 0.3,  pos1.width / 2.0, pos1.height / 2.0)
+# pos1 = plotSql2.get_position()
+# box = (0.35, -0.67, pos1.width / 2.0, pos1.height / 2.0)
+# pdp.table(ax=plotSql2, data=pivoted.T, loc='bottom left', bbox=box)
+# Where bbox is: [left, bottom, width, height]
+
+plotSql2.set_xlabel("Tranche")
+plotSql2.set_ylabel("Nombre")
+# This locator puts ticks at regular intervals
+plotSql2.yaxis.set_major_locator(major_loc)
+plotSql2.yaxis.set_minor_locator(minor_loc)
+plotSql2.yaxis.grid(True, which="minor")
+
+figSql2 = plotSql2.get_figure()
+str_plot2 = Lempica.get_figure_image_str(figSql2)
+
+
+# Prepare data for Jinja template
 dico = {'title': 'Jinja!',
         'text': 'paragraph text',
         'foo': 'Hello World!',
         'plot1': str_plot1,
-        'table': table}
-output_from_parsed_template = template.render(d=dico).encode("utf-8")
-# print(output_from_parsed_template)
+        'plot2': str_plot2,
+        'table': table,
+        'table2': pivoted_dict,
+        'table2html': pivoted.T.to_html()}
+output_html = template.render(d=dico)
+output_from_parsed_template = output_html.encode("utf-8")
 
 # to save the results
 with open("my_new_file.html", "wb") as fh:
     fh.write(output_from_parsed_template)
 
-# from weasyprint import HTML
-# HTML(string=output_from_parsed_template).write_pdf("my_new_file.pdf")
-
-# HTML(string=html_out).write_pdf(args.outfile.name, stylesheets=["style.css"])
-
 # Pandoc test
 # os.system("pandoc C:/Users/pitchugin.m/PycharmProjects/Anaconda/my_new_file.html -o C:/Users/pitchugin.m/PycharmProjects/Anaconda/my_new_file.pdf")
 
 
-
+# Pdfkit ok
 import pdfkit
-path_wkthmltopdf = 'E:/programs/wkhtmltopdf/bin/wkhtmltopdf.exe'
-pdfkit.from_string(output_from_parsed_template, "my_new_file2.pdf")
+
+# options = {
+#     'page-size': 'Letter',
+#     'margin-top': '0.25in',
+#     'margin-right': '0.25in',
+#     'margin-bottom': '0.25in',
+#     'margin-left': '0.25in',
+#     'encoding': "UTF-8",
+#     'no-outline': None
+# }
+options = {
+    'page-size': 'A4',
+    'margin-top': '0.75in',
+    'margin-right': '0.75in',
+    'margin-bottom': '0.75in',
+    'margin-left': '0.75in',
+    'encoding': "UTF-8",
+    'no-outline': None
+}
+css = 'print.css'
+
+pdfkit.from_string(output_html, "my_new_file2.pdf", options=options, css=css)
 
