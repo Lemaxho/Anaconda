@@ -9,6 +9,7 @@ import matplotlib.ticker as plticker
 matplotlib.style.use('ggplot')
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import pandas.tools.plotting as pdp
 import io
 import base64
@@ -36,7 +37,7 @@ template = env.get_template('test.html')
 
 accb_path1 = r"F:\debug\web\Anaconda_home\db_cy2_test.accdb"
 accb_path2 = r"D:\Data\code\Projets\Anaconda\db_cy2.accdb"
-connStr = "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s;" % accb_path1
+connStr = "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=%s;" % accb_path2
 cnxn = pyodbc.connect(connStr)
 cursor = cnxn.cursor()
 query = """select a.tranche, a.nbr as chenaie, b.nbr as pessiere from (select p.tranche, count(*) as nbr from pla90 as p
@@ -84,16 +85,18 @@ df_select.set_index('name')
 # Index from tranche, columns from name, values from nbr
 pivoted = df_select[['tranche', 'name', 'nbr']].pivot('tranche', 'name', 'nbr')
 table2 = pivoted.values.tolist()
-# print(table2)
-# print(list(pivoted))
+print(table2)
+print(list(pivoted))
 # print(pivoted.T)
 # print(type(pivoted.T))
 # print(pivoted.T.to_html())
-print(pivoted.T.to_dict())
+pivoted_dict = pivoted.T.to_dict(orient='list')
+print(pivoted_dict)
+print(pivoted.T.to_dict(orient='split'))
+# for key in pivoted_dict.keys():
+#     pivoted_dict[key] .items()
 
-pivoted_dict = pivoted.T.to_dict()
-
-# & (pivoted['nationality'] == "USA") pivoted['nbr'].notnull() pivoted.describe()  width=1, bar
+# pivoted['nbr'].notnull() pivoted.describe()  width=1, bar
 plotSql2 = pivoted.plot(kind='line', stacked=False,  lw=2, rot=0, alpha=0.5, legend=True, table=False)
 plotSql2.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), fancybox=True, shadow=False, ncol=3)
 # box = (pos1.x0 + 0.3, pos1.y0 + 0.3,  pos1.width / 2.0, pos1.height / 2.0)
@@ -112,6 +115,10 @@ plotSql2.yaxis.grid(True, which="minor")
 figSql2 = plotSql2.get_figure()
 str_plot2 = Lempica.get_figure_image_str(figSql2)
 
+ax = sns.barplot(data=pivoted, palette="Greens_d")
+figSql3 = ax.get_figure()
+str_plot3 = Lempica.get_figure_image_str(figSql3)
+
 
 # Prepare data for Jinja template
 dico = {'title': 'Jinja!',
@@ -120,8 +127,9 @@ dico = {'title': 'Jinja!',
         'plot1': str_plot1,
         'plot2': str_plot2,
         'table': table,
-        'table2': pivoted_dict,
-        'table2html': pivoted.T.to_html()}
+        'table2': table2,
+        'table2html': pivoted.T.to_html(),
+        'plot3': str_plot3}
 output_html = template.render(d=dico)
 output_from_parsed_template = output_html.encode("utf-8")
 
@@ -130,21 +138,13 @@ with open("my_new_file.html", "wb") as fh:
     fh.write(output_from_parsed_template)
 
 # Pandoc test
-# os.system("pandoc C:/Users/pitchugin.m/PycharmProjects/Anaconda/my_new_file.html -o C:/Users/pitchugin.m/PycharmProjects/Anaconda/my_new_file.pdf")
+# os.system("pandoc C:/Users/pitchugin.m/PycharmProjects/Anaconda/my_new_file.html
+# -o C:/Users/pitchugin.m/PycharmProjects/Anaconda/my_new_file.pdf")
 
 
 # Pdfkit ok
 import pdfkit
 
-# options = {
-#     'page-size': 'Letter',
-#     'margin-top': '0.25in',
-#     'margin-right': '0.25in',
-#     'margin-bottom': '0.25in',
-#     'margin-left': '0.25in',
-#     'encoding': "UTF-8",
-#     'no-outline': None
-# }
 options = {
     'page-size': 'A4',
     'margin-top': '0.75in',
